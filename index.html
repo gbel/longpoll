@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Server Connection Test</title>
+  <style type="text/css">
+  * { font-family: Verdana; font-size: 96%; }
+  label { width: 10em; float: left; }
+  label.error { float: none; color: red; padding-left: .5em; vertical-align: top; }
+  p { clear: both; }
+  .submit { margin-left: 12em; }
+  em { font-weight: bold; padding-right: 1em; vertical-align: top; }
+  .msg{ background:#aaa;padding:.2em; border-bottom:1px #000 solid;}
+  .old{ background-color:#246499;}
+  .new{ background-color:#3B9957;}
+  .err{ background-color:#992E36;}
+  </style>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript" src="http://jzaefferer.github.com/jquery-validation/jquery.validate.js"></script>
+  <script type="text/javascript" charset="utf-8">
+      function addmsg(type, msg){
+        /* Simple helper to add a div.
+        type is the name of a CSS class (old/new/error).
+        msg is the contents of the div */
+        $("#messages").append(
+            "<div class='msg "+ type +"'>"+ msg +"</div>"
+        );
+    }
+
+    function waitForMsg(){
+        $.ajax({ url: "/webtest",
+                async: true,
+                cache: false,
+                // timeout after 1 min
+                // timeout: 60000,
+                /* It does not work with a very short interval
+                like (1s) and it breaks the stack.
+                For tighter control on the update intervals,
+                a server-side push state solution may be more appropriate
+                Something like Socket.IO (Node.js) */
+                // process successfull response
+                success: function(data){
+                    var result = JSON.parse(data);
+                    if (result.status === "SUCCESS") {
+                        addmsg("new", result.timestamp+": "+result.status);
+                    }
+                    else if (result.status === "ERROR") {
+                        addmsg("err", result.timestamp+": "+result.status);
+                    }
+                    //call again in .5 sec
+                    setTimeout('waitForMsg()', 500);
+                },
+                dataType: "json",
+                // handle error
+                error: function(XMLHttpRequest, textStatus, errorThrown){
+                    addmsg("old", textStatus + " (" + errorThrown + ")");
+                    //try again in 15 sec if request error
+                    setTimeout('waitForMsg()',"15000");
+                },
+                });
+    };
+
+  $(document).ready(function(){
+    waitForMsg();
+    /* Validate the form and post it to the server */
+    $('#ServerForm').validate({
+        submitHandler: function(form) {
+            $.post($(form).attr("action"),
+                   $(form).serialize(),
+                   function(data) {
+                    // handle response
+                    console.log(data);
+                    }, "json");
+        }
+    });
+  });
+  </script>
+</head>
+<body>
+  <div id="messages">
+      <div class="msg old">
+          Messages
+      </div>
+  </div>
+  <form action="/webtest" id="ServerForm" >
+   <fieldset>
+    <p><label for="sserver">Server</label><em>*</em>
+    <input type="text" name="server" class="required" value="" />
+    </p>
+    <p><label for="sport">Port</label><em>*</em>
+    <input type="text" name="port" class="required" value="" />
+    </p>
+    <p><label for="suser">Username</label><em>*</em>
+    <input type="text" name="suser" class="required" value="" />
+    </p>
+    <p><label for="spass">Password</label><em>*</em>
+    <input type="text" name="spass" class="required" value="" />
+    </p>
+   <input class="submit" type="submit" name="submit" value="Submit" />
+   </fieldset>
+  </form>
+
+</body>
+</html>
