@@ -38,4 +38,3 @@ open your browser on http://localhost:8888
 Bug/Problems
 ------------
 - Test requests should be identified and isolated, only the requester gets the response.
-Prof of concept of a realtime long polling with Tornado and pika/RabbitMQ.
