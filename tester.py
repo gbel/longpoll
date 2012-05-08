@@ -11,7 +11,7 @@ import urllib2
 
 def test_conn():
     '''
-    Fake server connection test result that randomly returns json 200 or 400
+    Fake server connection test result that randomly returns json  SUCCESS or ERROR
     '''
     conn_ok = {'status': 'SUCCESS',
                'response_code': 200,

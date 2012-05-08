@@ -3,7 +3,7 @@ longpool
 
 Long polling with Tornado and pika/RabbitMQ
 -------------------------------------------
-Prof of concept of a realtime long polling with Tornado and pika/RabbitMQ.
+Proof of concept of a realtime long polling application with Tornado and pika/RabbitMQ.
 
 It is a Web form to test a server connection receiving a random response, "Success" or "Error".
 
